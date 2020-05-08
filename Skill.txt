@@ -1,0 +1,22 @@
+
+1. Filter "non number string" data
+*Table SensorData, Message is text field
+id	Sensor	TimeStamp	Topic		Message
+1	12345	210963.265	test/topic	Ed Sheeran
+1768	12345	214496.968	test/topic	5
+1920	12345	214798.593	test/topic	
+2070	12345	215096.625	test/topic	2
+2673	12345	216301.421	test/topic	
+2824	12345	216600.843	test/topic	1
+2973	12345	216896.562	test/topic	4
+
+*sql:select * from SensorData where NOT(Message GLOB '*[0-9]*');
+*result:
+1	12345	210963.265	test/topic	Ed Sheeran
+1920	12345	214798.593	test/topic	
+2673	12345	216301.421	test/topic		
+
+*study: https://www.sqlitetutorial.net/sqlite-glob/
+The GLOB operator is similar to the LIKE operator. The GLOB operator determines whether a string matches a specific pattern
+Unlike the LIKE operator, the GLOB operator is case sensitive and uses the UNIX wildcards
+Note that GLOB '*[0-9]*' will find digits nested between other characters as well
