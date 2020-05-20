@@ -1,1 +1,44 @@
 https://kipalog.com/posts/Gioi-thieu-MySQL-Replication
+
+On slaver:
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 172.0.0.1
+                  Master_User: slave_user
+              Master_Log_File: m01-bin.000001
+          Read_Master_Log_Pos: 827
+               Relay_Log_File: m02-relay-bin.000002
+                Relay_Log_Pos: 251
+        Relay_Master_Log_File: m01-bin.000001
+                   Last_Errno: 0
+                   Last_Error: 
+                 Skip_Counter: 0
+          Exec_Master_Log_Pos: 827
+              Relay_Log_Space: 405
+        Seconds_Behind_Master: 0
+                Last_IO_Errno: 0
+                Last_IO_Error: 
+               Last_SQL_Errno: 0
+               Last_SQL_Error: 
+             Master_Server_Id: 1
+
+Master
+E:\xampp\mysql\bin\my.ini
+log-bin=mysql-bin
+server-id=1
+
+Slaver
+E:\xampp\mysql\bin\my.ini
+server-id=2
+master-host     =   <hostname>
+master-user     =   <username>
+master-password =   <password>
+master-port     =  <port>
+
+
+
+> CHANGE MASTER TO MASTER_HOST='172.17.0.1',MASTER_USER='slave_user', MASTER_PASSWORD='p@ssword', MASTER_LOG_FILE='m01-bin.000001', MASTER_LOG_POS=827;
+> START SLAVE
+> SHOW SLAVE STATUS\G
+
+
+
