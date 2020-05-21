@@ -33,12 +33,39 @@ master-host     =   <hostname>
 master-user     =   <username>
 master-password =   <password>
 master-port     =  <port>
-
+//for specificed db:
+replicate-do-db="autotester"
 
 
 > CHANGE MASTER TO MASTER_HOST='172.17.0.1',MASTER_USER='slave_user', MASTER_PASSWORD='p@ssword', MASTER_LOG_FILE='m01-bin.000001', MASTER_LOG_POS=827;
 > START SLAVE
 > SHOW SLAVE STATUS\G
 
+Error: Tables does not exist
+Solution:
+https://stackoverflow.com/questions/26999558/mysql-replication-issues-error-table-xxx-xxx-doesnt-exist-cant-even-start-re
+https://stackoverflow.com/questions/17701524/mysql-replication-skip-statement-is-it-possible
+> STOP SLAVE;
+> SET GLOBAL sql_slave_skip_counter = 1;
+> START SLAVE;
+
+
+///////////////////
+//on Master
+//https://www.journaldev.com/29314/set-up-mariadb-master-slave-replication-centos
+//config server
+#replication, edit/add by minhnt27, 21/05/2020
+#server_id=1
+#log-basename=master
+#log_bin=mysql-bin
+#log_error=mysql-bin.err
+#binlog-format=row
+#binlog-do-db=hht20180903
+#end replication
+
+//add user
+GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%' IDENTIFIED BY 'Tthht@123';
+FLUSH PRIVILEGES;
+FLUSH TABLES WITH READ LOCK;
 
 
