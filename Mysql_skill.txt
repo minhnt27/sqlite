@@ -1,0 +1,50 @@
+
+
+mysql -u username -p******
+
+//Sau khi đổi pasword root, phpMyAdmin sẽ không tự login được trừ khi cài đặt sẵn password trong cấu hình sau.
+Step1: Go to... C:\xampp\phpMyAdmin
+Step2: Open the config.inc.php file
+Step3: Locate the following information and change the password.
+/* Authentication type and info */
+$cfg['Servers'][$i]['auth_type'] = 'config';
+$cfg['Servers'][$i]['user'] = 'ENTER_YOUR_USER_NAME_HERE';
+$cfg['Servers'][$i]['password'] = 'ENTER_YOUR_PASS_HERE';
+$cfg['Servers'][$i]['extension'] = 'mysqli';
+$cfg['Servers'][$i]['AllowNoPassword'] = true;
+$cfg['Lang'] = '';
+
+//Thiết lập đăng nhập khi login phpMyAdmin
+Step1: Locate phpMyAdmin installation path.
+Step2: Open phpMyAdmin/config.inc.php in your favourite text editor. Copy config.sample.inc.php to config.inc.php if it's missing.
+Step3: 
+Search for $cfg['Servers'][$i]['auth_type'] = 'config';
+Replace it with $cfg['Servers'][$i]['auth_type'] = 'cookie';
+
+//Change port Apache
+Step1: Edit the file "httpd.conf"
+Listen 8081
+ServerName localhost:8081
+Step1': Edit the file "http-ssl.conf"
+Listen 8013
+<VirtualHost _default_:8013>
+ServerName localhost:8013
+
+Step2: Xampp Control Panel/Go to Config ► Service and Port Settings
+set trên GUI
+
+//Sửa table
+mysql> CHECK TABLE table_name;
+mysql> REPAIR TABLE table_name;
+Output
++--------------------------+--------+----------+----------+
+| Table                    | Op     | Msg_type | Msg_text |
++--------------------------+--------+----------+----------+
+| database_name.table_name | repair | status   | OK       |
++--------------------------+--------+----------+----------+
+
+//show user
+mysql> select host, user, password from mysql.user;
+mysql> DROP USER username;
+
+

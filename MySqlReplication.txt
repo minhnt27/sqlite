@@ -1,46 +1,116 @@
 https://kipalog.com/posts/Gioi-thieu-MySQL-Replication
 
-On slaver:
-               Slave_IO_State: Waiting for master to send event
-                  Master_Host: 172.0.0.1
-                  Master_User: slave_user
-              Master_Log_File: m01-bin.000001
-          Read_Master_Log_Pos: 827
-               Relay_Log_File: m02-relay-bin.000002
-                Relay_Log_Pos: 251
-        Relay_Master_Log_File: m01-bin.000001
-                   Last_Errno: 0
-                   Last_Error: 
-                 Skip_Counter: 0
-          Exec_Master_Log_Pos: 827
-              Relay_Log_Space: 405
-        Seconds_Behind_Master: 0
-                Last_IO_Errno: 0
-                Last_IO_Error: 
-               Last_SQL_Errno: 0
-               Last_SQL_Error: 
-             Master_Server_Id: 1
+///////////////////
+//on Master CenOS7
+//https://www.journaldev.com/29314/set-up-mariadb-master-slave-replication-centos
+//config server, my.cnf
+#replication, edit/add by minhnt27, 21/05/2020
+server_id=1
+log_bin=mysql-bin
+log_error=mysql-bin.err
+binlog-do-db=hht20180903
+#end replication
 
-Master
-E:\xampp\mysql\bin\my.ini
-log-bin=mysql-bin
-server-id=1
+//add user
+%DIR>> mysql -u root -p******
+MariaDB [(none)]> GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%' IDENTIFIED BY 'Tthht@123';
+MariaDB [(none)]> FLUSH PRIVILEGES;
+MariaDB [(none)]> FLUSH TABLES WITH READ LOCK;
 
-Slaver
-E:\xampp\mysql\bin\my.ini
-server-id=2
-master-host     =   <hostname>
-master-user     =   <username>
-master-password =   <password>
-master-port     =  <port>
-//for specificed db:
-replicate-do-db="autotester"
+**** systemctl status mariadb
+**** systemctl restart mariadb
+
+MariaDB [(none)]> SHOW MASTER STATUS;
++------------------+----------+--------------+------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
++------------------+----------+--------------+------------------+
+| mysql-bin.000001 |      245 | hht20180903  |                  |
++------------------+----------+--------------+------------------+
+
+//On Salve Win12
+//config server my.ini
+#replication
+server_id=2
+replicate-do-db="hht20180903"
+#end replication
 
 
-> CHANGE MASTER TO MASTER_HOST='172.17.0.1',MASTER_USER='slave_user', MASTER_PASSWORD='p@ssword', MASTER_LOG_FILE='m01-bin.000001', MASTER_LOG_POS=827;
-> START SLAVE
-> SHOW SLAVE STATUS\G
+%DIR>> mysql -u root -p******
 
+MariaDB [(none)]> CHANGE MASTER TO MASTER_HOST='10.73.132.146',MASTER_USER='replica', MASTER_PASSWORD='Tthht@123';
+Query OK, 0 rows affected (0.134 sec)
+
+***** restart Xamp
+
+MariaDB [(none)]> show slave status \G;
+ERROR 2006 (HY000): MySQL server has gone away
+No connection. Trying to reconnect...
+Connection id:    100
+Current database: *** NONE ***
+
+*************************** 1. row ***************************
+                Slave_IO_State: Waiting for master to send event
+                   Master_Host: 10.73.132.146
+                   Master_User: replica
+                   Master_Port: 3306
+                 Connect_Retry: 60
+               Master_Log_File: mysql-bin.000001
+           Read_Master_Log_Pos: 5813
+                Relay_Log_File: mysql-relay-bin.000003
+                 Relay_Log_Pos: 6112
+         Relay_Master_Log_File: mysql-bin.000001
+              Slave_IO_Running: Yes
+             Slave_SQL_Running: Yes
+               Replicate_Do_DB: hht20180903
+           Replicate_Ignore_DB:
+            Replicate_Do_Table:
+        Replicate_Ignore_Table:
+       Replicate_Wild_Do_Table:
+   Replicate_Wild_Ignore_Table:
+                    Last_Errno: 0
+                    Last_Error:
+                  Skip_Counter: 0
+           Exec_Master_Log_Pos: 5813
+               Relay_Log_Space: 6677
+               Until_Condition: None
+                Until_Log_File:
+                 Until_Log_Pos: 0
+            Master_SSL_Allowed: No
+            Master_SSL_CA_File:
+            Master_SSL_CA_Path:
+               Master_SSL_Cert:
+             Master_SSL_Cipher:
+                Master_SSL_Key:
+         Seconds_Behind_Master: 0
+ Master_SSL_Verify_Server_Cert: No
+                 Last_IO_Errno: 0
+                 Last_IO_Error:
+                Last_SQL_Errno: 0
+                Last_SQL_Error:
+   Replicate_Ignore_Server_Ids:
+              Master_Server_Id: 1
+                Master_SSL_Crl:
+            Master_SSL_Crlpath:
+                    Using_Gtid: No
+                   Gtid_IO_Pos:
+       Replicate_Do_Domain_Ids:
+   Replicate_Ignore_Domain_Ids:
+                 Parallel_Mode: conservative
+                     SQL_Delay: 0
+           SQL_Remaining_Delay: NULL
+       Slave_SQL_Running_State: Slave has read all relay log; waiting for the sl
+ave I/O thread to update it
+              Slave_DDL_Groups: 0
+Slave_Non_Transactional_Groups: 0
+    Slave_Transactional_Groups: 0
+1 row in set (0.007 sec)
+
+ERROR: No query specified
+
+
+=====================
+=====================
+=====================
 Error: Tables does not exist
 Solution:
 https://stackoverflow.com/questions/26999558/mysql-replication-issues-error-table-xxx-xxx-doesnt-exist-cant-even-start-re
@@ -48,24 +118,4 @@ https://stackoverflow.com/questions/17701524/mysql-replication-skip-statement-is
 > STOP SLAVE;
 > SET GLOBAL sql_slave_skip_counter = 1;
 > START SLAVE;
-
-
-///////////////////
-//on Master
-//https://www.journaldev.com/29314/set-up-mariadb-master-slave-replication-centos
-//config server
-#replication, edit/add by minhnt27, 21/05/2020
-#server_id=1
-#log-basename=master
-#log_bin=mysql-bin
-#log_error=mysql-bin.err
-#binlog-format=row
-#binlog-do-db=hht20180903
-#end replication
-
-//add user
-GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%' IDENTIFIED BY 'Tthht@123';
-FLUSH PRIVILEGES;
-FLUSH TABLES WITH READ LOCK;
-
 
